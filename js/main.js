@@ -4,13 +4,6 @@ let restaurants,
 var map
 var markers = []
 
-
-if('serviceWorker' in navigator) {
-  navigator.serviceWorker
-    .register('../sw.js')
-    .then(function() {console.log("Service Worker Registerd");});
-}
-
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
@@ -65,6 +58,7 @@ fetchCuisines = () => {
  */
 fillCuisinesHTML = (cuisines = self.cuisines) => {
   const select = document.getElementById('cuisines-select');
+
   cuisines.forEach(cuisine => {
     const option = document.createElement('option');
     option.innerHTML = cuisine;
@@ -86,7 +80,6 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-
   updateRestaurants();
 }
 
@@ -144,40 +137,37 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  */
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
-  li.className='my-well';
-
-  const div2=document.createElement('div');
-  div2.className='restaurants-list-imgbox';
+  li.setAttribute("tabindex", 0);
 
   const image = document.createElement('img');
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.alt = 'Image of ' + restaurant.name;
-  div2.append(image);
+  image.className = 'restaurant-img';
+  image.src = DBHelper.imageUrlForRestaurantSmall(restaurant);
 
-  li.append(div2);
+  image.alt = 'Restaurant ' + restaurant.name + ' - photo';
+  li.append(image);
 
-  const div1 = document.createElement('div');
-  div1.className='restaurants-list-info';
-  div1.setAttribute("tabIndex","0");
-
-  const name = document.createElement('h2');
+  const name = document.createElement('h3');
   name.innerHTML = restaurant.name;
-  div1.append(name);
+  name.setAttribute("tabindex", 0);
+  li.append(name);
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
-  div1.append(neighborhood);
+  neighborhood.setAttribute("tabindex", 0);
+  li.append(neighborhood);
 
   const address = document.createElement('p');
   address.innerHTML = restaurant.address;
-  div1.append(address);
+  address.setAttribute("tabindex", 0);
+  li.append(address);
 
-  const more = document.createElement('button');
+  const more = document.createElement('a');
   more.innerHTML = 'View Details';
-  more.addEventListener('click', function() {window.location.href=DBHelper.urlForRestaurant(restaurant);});
-  div1.append(more);
-
-  li.append(div1);
+  more.setAttribute("tabindex", 0);
+  more.setAttribute("aria-describedby", "more-info");
+  more.setAttribute("title", 'View details about restaurant ' + restaurant.name);
+  more.href = DBHelper.urlForRestaurant(restaurant);
+  li.append(more)
 
   return li
 }
